@@ -3564,10 +3564,10 @@ PX_FORCE_INLINE VecU32V V4U32SplatElement(VecU32V a)
 	}
 }
 
+#if !PX_SWITCH
 template <int index>
 PX_FORCE_INLINE Vec4V V4SplatElement(Vec4V a)
 {
-#if PX_UWP
 	if(index == 0)
 	{
 		return vdupq_lane_f32(vget_low_f32(a), 0);
@@ -3576,12 +3576,6 @@ PX_FORCE_INLINE Vec4V V4SplatElement(Vec4V a)
 	{
 		return vdupq_lane_f32(vget_low_f32(a), 1);
 	}
-#else
-	if(index < 2)
-	{
-		return vdupq_lane_f32(vget_low_f32(a), index);
-	}
-#endif
 	else if(index == 2)
 	{
 		return vdupq_lane_f32(vget_high_f32(a), 0);
@@ -3591,6 +3585,14 @@ PX_FORCE_INLINE Vec4V V4SplatElement(Vec4V a)
 		return vdupq_lane_f32(vget_high_f32(a), 1);
 	}
 }
+#else
+//workaround for template compile issue
+template <int index> PX_FORCE_INLINE Vec4V V4SplatElement(Vec4V a);
+template <> PX_FORCE_INLINE Vec4V V4SplatElement<0>(Vec4V a) { return vdupq_lane_f32(vget_low_f32(a), 0); }
+template <> PX_FORCE_INLINE Vec4V V4SplatElement<1>(Vec4V a) { return vdupq_lane_f32(vget_low_f32(a), 1); }
+template <> PX_FORCE_INLINE Vec4V V4SplatElement<2>(Vec4V a) { return vdupq_lane_f32(vget_high_f32(a), 0); }
+template <> PX_FORCE_INLINE Vec4V V4SplatElement<3>(Vec4V a) { return vdupq_lane_f32(vget_high_f32(a), 1); }
+#endif
 
 PX_FORCE_INLINE VecU32V U4LoadXYZW(PxU32 x, PxU32 y, PxU32 z, PxU32 w)
 {

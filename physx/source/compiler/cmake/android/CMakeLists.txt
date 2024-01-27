@@ -1,4 +1,3 @@
-##
 ## Redistribution and use in source and binary forms, with or without
 ## modification, are permitted provided that the following conditions
 ## are met:
@@ -23,14 +22,14 @@
 ## (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 ## OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ##
-## Copyright (c) 2008-2021 NVIDIA Corporation. All rights reserved.
+## Copyright (c) 2008-2022 NVIDIA Corporation. All rights reserved.
 
 # We define the CXX flags for this CMakeLists and all others that are included afterwards. This is a GLOBAL setting. 
 # If/when the solutions go standalone (say, samples and visual tests) - those CMakeLists will need to be fixed.
 
 STRING(TOLOWER "${CMAKE_BUILD_TYPE}" CMAKE_BUILD_TYPE_LOWERCASE)
 
-SET(PHYSX_WARNING_DISABLES "-Wno-invalid-offsetof -Wno-maybe-uninitialized  -Wno-unused-variable -Wno-variadic-macros -Wno-array-bounds -Wno-strict-aliasing")
+SET(PHYSX_WARNING_DISABLES "-Wno-unused-local-typedef -Wno-invalid-offsetof -Wno-invalid-noreturn -Wno-bitwise-instead-of-logical -Wno-unused-but-set-variable -Wno-unused-private-field -Wno-deprecated-copy -Wno-unused-variable -Wno-variadic-macros -Wno-array-bounds -Wno-strict-aliasing")
 
 IF(${ANDROID_ABI} STREQUAL "armeabi-v7a")
 	SET(PHYSX_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Werror -Wall -Wextra -Wpedantic -std=c++11 -fno-rtti -fno-exceptions -ffunction-sections -fdata-sections -funwind-tables -fomit-frame-pointer -funswitch-loops -finline-limit=300 -fno-strict-aliasing -fstack-protector ${PHYSX_WARNING_DISABLES}" CACHE INTERNAL "PhysX CXX")
@@ -59,6 +58,12 @@ SET(CMAKE_CXX_FLAGS_CHECKED ${PHYSX_CXX_FLAGS_CHECKED})
 SET(CMAKE_CXX_FLAGS_PROFILE ${PHYSX_CXX_FLAGS_PROFILE})
 SET(CMAKE_CXX_FLAGS_RELEASE ${PHYSX_CXX_FLAGS_RELEASE})
 
+IF(PUBLIC_RELEASE)
+	SET(PUBLIC_RELEASE_FLAG "PX_PUBLIC_RELEASE=1")
+ELSE()
+	SET(PUBLIC_RELEASE_FLAG "PX_PUBLIC_RELEASE=0")
+ENDIF()
+
 # Controls PX_NVTX for all projects
 SET(NVTX_FLAG "PX_NVTX=0")
 
@@ -66,12 +71,14 @@ IF(PX_SCALAR_MATH)
 	SET(SCALAR_MATH_FLAG "PX_SIMD_DISABLED")
 ENDIF()
 
-# Disable cuda and dx for all projects on Android
-SET(PHYSX_ANDROID_COMPILE_DEFS "__STDC_LIMIT_MACROS;${SCALAR_MATH_FLAG};${PHYSX_AUTOBUILD}" CACHE INTERNAL "Base PhysX preprocessor definitions")
-SET(PHYSX_ANDROID_DEBUG_COMPILE_DEFS "_DEBUG;PX_DEBUG=1;PX_CHECKED=1;${NVTX_FLAG};PX_SUPPORT_PVD=1" CACHE INTERNAL "Debug PhysX preprocessor definitions")
-SET(PHYSX_ANDROID_CHECKED_COMPILE_DEFS "NDEBUG;PX_CHECKED=1;${NVTX_FLAG};PX_SUPPORT_PVD=1" CACHE INTERNAL "Checked PhysX preprocessor definitions")
-SET(PHYSX_ANDROID_PROFILE_COMPILE_DEFS "NDEBUG;PX_PROFILE=1;${NVTX_FLAG};PX_SUPPORT_PVD=1" CACHE INTERNAL "Profile PhysX preprocessor definitions")
-SET(PHYSX_ANDROID_RELEASE_COMPILE_DEFS "NDEBUG;PX_SUPPORT_PVD=0" CACHE INTERNAL "Release PhysX preprocessor definitions")
+# Disable OmniPVD for all projects on Android
+SET(PX_SUPPORT_OMNI_PVD_FLAG "PX_SUPPORT_OMNI_PVD=0")
+
+SET(PHYSX_ANDROID_COMPILE_DEFS "__STDC_LIMIT_MACROS;${SCALAR_MATH_FLAG};${PHYSX_AUTOBUILD};${PUBLIC_RELEASE_FLAG};${FEATURES_UNDER_CONSTRUCTION_FLAG}" CACHE INTERNAL "Base PhysX preprocessor definitions")
+SET(PHYSX_ANDROID_DEBUG_COMPILE_DEFS "_DEBUG;PX_DEBUG=1;PX_CHECKED=1;${NVTX_FLAG};PX_SUPPORT_PVD=1;${PX_SUPPORT_OMNI_PVD_FLAG}" CACHE INTERNAL "Debug PhysX preprocessor definitions")
+SET(PHYSX_ANDROID_CHECKED_COMPILE_DEFS "NDEBUG;PX_CHECKED=1;${NVTX_FLAG};PX_SUPPORT_PVD=1;${PX_SUPPORT_OMNI_PVD_FLAG}" CACHE INTERNAL "Checked PhysX preprocessor definitions")
+SET(PHYSX_ANDROID_PROFILE_COMPILE_DEFS "NDEBUG;PX_PROFILE=1;${NVTX_FLAG};PX_SUPPORT_PVD=1;${PX_SUPPORT_OMNI_PVD_FLAG}" CACHE INTERNAL "Profile PhysX preprocessor definitions")
+SET(PHYSX_ANDROID_RELEASE_COMPILE_DEFS "NDEBUG;PX_SUPPORT_PVD=0;PX_SUPPORT_OMNI_PVD=0" CACHE INTERNAL "Release PhysX preprocessor definitions")
 
 SET(CMAKE_DEBUG_POSTFIX "${CMAKE_DEBUG_POSTFIX}")
 SET(CMAKE_PROFILE_POSTFIX "${CMAKE_PROFILE_POSTFIX}")

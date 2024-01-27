@@ -71,15 +71,8 @@ namespace Ext
 		Ps::SList							mTaskEntryPtrPool;
 	};
 
-#if PX_VC
-#pragma warning(pop)
-#endif
-
-} // namespace Ext
-
-
 template <class Alloc>
-Ext::SharedQueueEntryPool<Alloc>::SharedQueueEntryPool(PxU32 poolSize, const Alloc& alloc)
+SharedQueueEntryPool<Alloc>::SharedQueueEntryPool(PxU32 poolSize, const Alloc& alloc)
 	: Alloc(alloc)
 {
 	Ps::AlignedAllocator<PX_SLIST_ALIGNMENT, Alloc> alignedAlloc("SharedQueueEntryPool");
@@ -101,7 +94,7 @@ Ext::SharedQueueEntryPool<Alloc>::SharedQueueEntryPool(PxU32 poolSize, const All
 
 
 template <class Alloc>
-Ext::SharedQueueEntryPool<Alloc>::~SharedQueueEntryPool()
+SharedQueueEntryPool<Alloc>::~SharedQueueEntryPool()
 {
 	if (mTaskEntryPool)
 	{
@@ -112,7 +105,7 @@ Ext::SharedQueueEntryPool<Alloc>::~SharedQueueEntryPool()
 
 
 template <class Alloc>
-Ext::SharedQueueEntry* Ext::SharedQueueEntryPool<Alloc>::getEntry(void* objectRef)
+SharedQueueEntry* Ext::SharedQueueEntryPool<Alloc>::getEntry(void* objectRef)
 {
 	SharedQueueEntry* e = static_cast<SharedQueueEntry*>(mTaskEntryPtrPool.pop());
 	if (e)
@@ -137,7 +130,7 @@ Ext::SharedQueueEntry* Ext::SharedQueueEntryPool<Alloc>::getEntry(void* objectRe
 
 
 template <class Alloc>
-void Ext::SharedQueueEntryPool<Alloc>::putEntry(Ext::SharedQueueEntry& entry)
+void SharedQueueEntryPool<Alloc>::putEntry(Ext::SharedQueueEntry& entry)
 {
 	if (entry.mPooledEntry)
 	{
@@ -151,6 +144,11 @@ void Ext::SharedQueueEntryPool<Alloc>::putEntry(Ext::SharedQueueEntry& entry)
 	}
 }
 
+#if PX_VC
+#pragma warning(pop)
+#endif
+
+} // namespace Ext
 }
 
 #endif

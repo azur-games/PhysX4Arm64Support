@@ -1,0 +1,9 @@
+physx/bin/win.x86_64.vc141.mt/
+physx/compiler/android-arm64-v8a-checked/
+physx/compiler/android-arm64-v8a-debug/cmake_install.cmake
+physx/compiler/android-arm64-v8a-debug/
+physx/compiler/android-arm64-v8a-profile/
+physx/compiler/android-arm64-v8a-release/
+.vs
+physx/compiler/vc15win64/
+physx/install/
